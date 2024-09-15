@@ -32,5 +32,16 @@ namespace api.Mappers
                 DepartmentId = positionDto.DepartmentId
             };
         }
+
+        public static Position ToPositionUpdateDto(this PositionUpdateDto positionDto, int id)
+        {
+            return new Position
+            {
+                PositionId = id,
+                Title = positionDto.Title,
+                Salary = positionDto.Salary,
+                DepartmentId = positionDto.DepartmentId
+            };
+        }
     }
 }

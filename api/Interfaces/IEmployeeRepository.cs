@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOs.Employee;
 using api.Helpers;
 using api.Models;
 
@@ -11,12 +12,16 @@ namespace api.Interfaces
     {
         Task<List<Employee>> GetAllAsync(QueryObjectEmployee queryObjectEmployee);
 
-        Task<Employee> GetByIdAsync(int employeeId);
+        Task<Employee?> GetByIdAsync(int employeeId);
 
-        Task<Employee> CreateAsync(Employee employee);
+        Task<Employee> CreateAsync(Employee employeeModel);
 
-        Task<Employee> UpdateAsync(Employee employee);
+        Task<Employee?> UpdateAsync(int id, EmployeeUpdateDto employeeUpdate);
 
-        Task<Employee> DeleteAsync(int employeeId);
+        Task<Employee?> DeleteAsync(int employeeId);
+
+        Task<bool> IsExistsAsync(int employeeId);
+
+        Task<bool> AnyExistAsync();
     }
 }

@@ -33,5 +33,15 @@ namespace api.Mappers
             };
 
         }
+
+        public static Department ToDepartmentUpdateDto(this DepartmentUpdateDto departmentDto, int id)
+        {
+            return new Department
+            {
+                DepartmentId = id,
+                Name = departmentDto.Name,
+                ParentDepartmentId = departmentDto.ParentDepartmentId
+            };
+        }
     }
 }

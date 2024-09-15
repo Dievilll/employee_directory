@@ -7,6 +7,7 @@ namespace api.DTOs.Department
 {
     public class DepartmentUpdateDto
     {
-        
+        public string Name { get; set; }
+        public int? ParentDepartmentId { get; set; }
     }
 }

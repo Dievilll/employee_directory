@@ -12,8 +12,9 @@ namespace api.Helpers
 
         public string? PhoneNumber { get; set; } = null;
 
-        public Department? DepartmentName { get; set; } = null;
+        public string? DepartmentName { get; set; } = string.Empty;
 
+        public string? SortBy { get; set; } = string.Empty;
         public bool IsDescending { get; set; } = false;
     }
 }

@@ -8,6 +8,7 @@ using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
+using api.DTOs.Department;
 
 namespace api.Repository
 {
@@ -20,53 +21,23 @@ namespace api.Repository
             _context = context;
         }
 
-        public async Task<bool> IsExistsAsync(int departmentId)
-        {
-            return await _context.Departments.AnyAsync(d => d.DepartmentId == departmentId);
-        }
-
-        public async Task<bool> AnyExistAsync()
-        {
-            return await _context.Departments.AnyAsync();
-        }
-
-        public async Task<Department> CreateAsync(Department departmentModel)
-        {
-            await _context.AddAsync(departmentModel);
-            await _context.SaveChangesAsync();
-            return departmentModel;
-        }
-
-        public async Task<Department?> DeleteAsync(int departmentId)
-        {
-            var departmentModel = await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
-            
-            if(departmentModel == null)
-            {
-                return null;
-            }
-            _context.Departments.Remove(departmentModel);
-            await _context.SaveChangesAsync();
-
-            return departmentModel;
-        }
-
         public async Task<List<Department>> GetAllAsync(QueryObjectDepartment query)
         {
             var departments = _context.Departments
             .Include(pd => pd.ParentDepartment)
             .Include(sd => sd.SubDepartments)
             .Include(p => p.Positions)
+                .ThenInclude(e => e.Employees)
             .AsQueryable();
 
             if(!string.IsNullOrWhiteSpace(query.Name))
             {
-                departments = departments.Where(x => x.Name.Contains(query.Name));
+                departments = departments.Where(x => x.Name.ToLower().Contains(query.Name.ToLower()));
             }
 
             if(!string.IsNullOrWhiteSpace(query.PositionTitle))
             {
-                departments = departments.Where(x => x.Positions.Any(p => p.Title.Contains(query.PositionTitle)));
+                departments = departments.Where(x => x.Positions.Any(p => p.Title.ToLower().Contains(query.PositionTitle.ToLower())));
             }
 
             if(!string.IsNullOrWhiteSpace(query.SortBy))
@@ -98,7 +69,14 @@ namespace api.Repository
             .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
         }
 
-        public async Task<Department?> UpdateAsync(int id, Department department)
+        public async Task<Department> CreateAsync(Department departmentModel)
+        {
+            await _context.AddAsync(departmentModel);
+            await _context.SaveChangesAsync();
+            return departmentModel;
+        }
+
+        public async Task<Department?> UpdateAsync(int id, DepartmentUpdateDto departmentUpdate)
         {
             var departmentModel = await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentId == id);
 
@@ -107,12 +85,36 @@ namespace api.Repository
                 return null;
             }
 
-            departmentModel.Name = department.Name;
-            departmentModel.ParentDepartmentId = department.ParentDepartmentId;
+            departmentModel.Name = departmentUpdate.Name;
+            departmentModel.ParentDepartmentId = departmentUpdate.ParentDepartmentId;
 
             await _context.SaveChangesAsync();
 
             return departmentModel;
+        }
+
+        public async Task<Department?> DeleteAsync(int departmentId)
+        {
+            var departmentModel = await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
+            
+            if(departmentModel == null)
+            {
+                return null;
+            }
+            _context.Departments.Remove(departmentModel);
+            await _context.SaveChangesAsync();
+
+            return departmentModel;
+        }
+
+        public async Task<bool> IsExistsAsync(int departmentId)
+        {
+            return await _context.Departments.AnyAsync(d => d.DepartmentId == departmentId);
+        }
+
+        public async Task<bool> AnyExistAsync()
+        {
+            return await _context.Departments.AnyAsync();
         }
     }
 }

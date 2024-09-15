@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.DTOs.Position;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,18 @@ namespace api.Repository
             _context = context;
         }
 
-        public Task<bool> AnyExistAsync()
+        public async Task<List<Position>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var positions = _context.Positions.Include(d => d.Department).Include(e => e.Employees);
+            return await positions.ToListAsync();
+        }
+
+        public async Task<Position?> GetByIdAsync(int positionId)
+        {
+            return await _context.Positions
+            .Include(d => d.Department)
+            .Include(e => e.Employees)
+            .FirstOrDefaultAsync(pi => pi.PositionId == positionId);
         }
 
         public async Task<Position> CreateAsync(Position position)
@@ -31,24 +41,47 @@ namespace api.Repository
             return position;
         }
 
-        public Task<Position> DeleteAsync(int positionId)
+        public async Task<Position?> UpdateAsync(int id, PositionUpdateDto positionUpdate)
         {
-            throw new NotImplementedException();
+            var posModel = await _context.Positions.FirstOrDefaultAsync(x => x.PositionId == id);
+
+            if(posModel == null)
+            {
+                return null;
+            }
+
+            posModel.Title = positionUpdate.Title;
+            posModel.Salary = positionUpdate.Salary;
+            posModel.DepartmentId = positionUpdate.DepartmentId;
+
+            await _context.SaveChangesAsync();
+            
+            return posModel;
         }
 
-        public async Task<Position> GetByIdAsync(int positionId)
+        public async Task<Position?> DeleteAsync(int positionId)
         {
-            return await _context.Positions.Include(e => e.Employees).FirstOrDefaultAsync(pi => pi.PositionId == positionId);
+            var posModel = _context.Positions.FirstOrDefault(x => x.PositionId == positionId);
+
+            if(posModel == null)
+            {
+                return null;
+            }
+
+            _context.Positions.Remove(posModel);
+            await _context.SaveChangesAsync();
+
+            return posModel;
         }
 
-        public Task<bool> IsExistsAsync(int positionId)
+        public async Task<bool> IsExistsAsync(int positionId)
         {
-            throw new NotImplementedException();
+            return await _context.Positions.AnyAsync(pi => pi.PositionId == positionId);
         }
 
-        public Task<Position> UpdateAsync(Position position)
+        public async Task<bool> AnyExistAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Positions.AnyAsync();
         }
     }
 }

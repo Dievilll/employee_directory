@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOs.Department;
 using api.Helpers;
 using api.Models;
 
@@ -13,9 +14,9 @@ namespace api.Interfaces
 
         Task<Department?> GetByIdAsync(int departmentId);
 
-        Task<Department> CreateAsync(Department department);
+        Task<Department> CreateAsync(Department departmentModel);
 
-        Task<Department?> UpdateAsync(int id, Department department);
+        Task<Department?> UpdateAsync(int id, DepartmentUpdateDto departmentUpdate);
 
         Task<Department?> DeleteAsync(int departmentId);
 

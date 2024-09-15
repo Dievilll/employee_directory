@@ -16,13 +16,11 @@ namespace api.Controllers
     [ApiController]
     public class DepartmentController: ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IDepartmentRepository _departmentRepo; 
 
-        public DepartmentController(ApplicationDbContext context, IDepartmentRepository departmentRepository)
+        public DepartmentController(IDepartmentRepository departmentRepository)
         {
             _departmentRepo = departmentRepository;
-            _context = context;
 
         }
 
@@ -43,6 +41,7 @@ namespace api.Controllers
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
+                
             var deps = await _departmentRepo.GetByIdAsync(id);
 
             if(deps == null)
@@ -56,46 +55,13 @@ namespace api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DepartmentCreateDto departmentDto)
         {
-            // if(!ModelState.IsValid)
-            //     return BadRequest(ModelState);
-            
-            // var anyDepartmentsExist = await _departmentRepo.AnyDepartmentsExistAsync();
-
-            // var departmentModel = departmentDto.ToDepartmentCreateDto();
-
-            // if(!anyDepartmentsExist)
-            // {
-            //     if(departmentDto.ParentDepartmentId.HasValue)
-            //     {
-            //         await _departmentRepo.CreateAsync(departmentModel);
-            //         return CreatedAtAction(nameof(GetById), new {id = departmentModel.DepartmentId}, departmentModel.ToDepartmentDto());
-            //     }
-            // }
-
-            // else
-            // {
-            //     if(departmentDto.ParentDepartmentId.HasValue)
-            //     {
-            //         var ParentDepartmentExists = await _departmentRepo.DepartmentExistsAsync(departmentDto.ParentDepartmentId.Value);
-                
-            //         if(!ParentDepartmentExists)
-            //         {
-            //             return BadRequest(ModelState);
-            //         }
-
-            //         await _departmentRepo.CreateAsync(departmentModel);
-                    
-            //     }
-            // }
-            // return CreatedAtAction(nameof(GetById), new {id = departmentModel.DepartmentId}, departmentModel.ToDepartmentDto());
             if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-            var anyDepartmentsExist = await _departmentRepo.AnyDepartmentsExistAsync();
+            var anyDepartmentsExist = await _departmentRepo.AnyExistAsync();
 
             if (!anyDepartmentsExist)
             {
-                // Если это первый отдел, ParentDepartmentId должен быть null
                 if (departmentDto.ParentDepartmentId.HasValue)
                 {
                     return BadRequest("Первый отдел не может иметь родительский отдел.");
@@ -103,13 +69,12 @@ namespace api.Controllers
             }
             else
             {
-                // Если это не первый отдел, ParentDepartmentId должен быть указан и существовать
                 if (!departmentDto.ParentDepartmentId.HasValue)
                 {
                     return BadRequest("ParentDepartmentId должен быть указан для всех отделов, кроме первого.");
                 }
 
-                var parentDepartmentExists = await _departmentRepo.DepartmentExistsAsync(departmentDto.ParentDepartmentId.Value);
+                var parentDepartmentExists = await _departmentRepo.IsExistsAsync(departmentDto.ParentDepartmentId.Value);
 
                 if (!parentDepartmentExists)
                 {
@@ -117,7 +82,6 @@ namespace api.Controllers
                 }
             }
 
-            // Загрузка родительского отдела
             Department parentDepartment = null;
             if (departmentDto.ParentDepartmentId.HasValue)
             {
@@ -128,7 +92,7 @@ namespace api.Controllers
             {
                 Name = departmentDto.Name,
                 ParentDepartmentId = departmentDto.ParentDepartmentId,
-                ParentDepartment = parentDepartment // Присваиваем загруженный родительский отдел
+                ParentDepartment = parentDepartment
             };
 
             await _departmentRepo.CreateAsync(departmentModel);
@@ -149,7 +113,25 @@ namespace api.Controllers
                 return NotFound();
             }
 
-            await _departmentRepo.UpdateAsync(id, departmentModel);
+            await _departmentRepo.UpdateAsync(id, departmentDto);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var departmentModel = await _departmentRepo.GetByIdAsync(id);
+
+            if(departmentModel == null)
+            {
+                return NotFound();
+            }
+
+            await _departmentRepo.DeleteAsync(id);
 
             return NoContent();
         }

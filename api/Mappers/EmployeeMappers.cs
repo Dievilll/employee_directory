@@ -23,5 +23,50 @@ namespace api.Mappers
                 Photo = employee.Photo
             };
         }
+
+        public static Employee ToEmployeeCreateDto(this EmployeeCreateDto employeeDto)
+        {
+            byte[] photoBytes = null;
+
+            if (employeeDto.Photo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    employeeDto.Photo.CopyTo(memoryStream);
+                    photoBytes = memoryStream.ToArray();
+                }
+            }
+            return new Employee
+            {
+                FullName = employeeDto.FullName,
+                DepartmentId = employeeDto.DepartmentId,
+                PositionId = employeeDto.PositionId,
+                PhoneNumber = employeeDto.PhoneNumber,
+                Photo = photoBytes
+            };
+        }
+
+        public static Employee ToEmployeeUpdateDto(this EmployeeUpdateDto employeeDto, int id)
+        {
+            byte[] photoBytes = null;
+
+            if (employeeDto.Photo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    employeeDto.Photo.CopyTo(memoryStream);
+                    photoBytes = memoryStream.ToArray();
+                }
+            }
+            return new Employee
+            {
+                EmployeeId = id,
+                FullName = employeeDto.FullName,
+                DepartmentId = employeeDto.DepartmentId,
+                PositionId = employeeDto.PositionId,
+                PhoneNumber = employeeDto.PhoneNumber,
+                Photo = photoBytes
+            };
+        }
     }
 }
