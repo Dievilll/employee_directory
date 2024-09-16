@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, CardMedia, Typography, TextField, Button } from '@mui/material';
-import { FixedSizeList as List } from 'react-window';
+import { TextField, Button, List, ListItem, ListItemText, Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import EmployeeForm from './EmployeeForm';
 
 const EmployeeList = () => {
@@ -9,14 +9,19 @@ const EmployeeList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [expandedDepartments, setExpandedDepartments] = useState({});
 
     useEffect(() => {
         fetchEmployees();
     }, []);
 
     const fetchEmployees = async () => {
-        const response = await axios.get('/api/employee');
-        setEmployees(response.data);
+        try {
+            const response = await axios.get('http://localhost:5085/api/employee');
+            setEmployees(response.data);
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
     };
 
     const handleSearch = (event) => {
@@ -38,48 +43,77 @@ const EmployeeList = () => {
         fetchEmployees();
     };
 
+    const handleFormCancel = () => {
+        setShowForm(false);
+    };
+
+    const handleDepartmentClick = (departmentName) => {
+        setExpandedDepartments(prev => ({
+            ...prev,
+            [departmentName]: !prev[departmentName]
+        }));
+    };
+
+    const handleEmployeeClick = (employee) => {
+        setSelectedEmployee(employee);
+    };
+
     const filteredEmployees = employees.filter(employee =>
         employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.phoneNumber.includes(searchTerm) ||
         employee.departmentName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const Row = ({ index, style }) => (
-        <div style={style} key={filteredEmployees[index].employeeId}>
-            <Card style={{ width: '300px', margin: '10px' }}>
-                <CardMedia
-                    component="img"
-                    height="140"
-                    image={`data:image/jpeg;base64,${filteredEmployees[index].photo}`}
-                    alt={filteredEmployees[index].fullName}
-                />
-                <CardContent>
-                    <Typography variant="h5">{filteredEmployees[index].fullName}</Typography>
-                    <Typography variant="body2">Department: {filteredEmployees[index].departmentName}</Typography>
-                    <Typography variant="body2">Position: {filteredEmployees[index].positionTitle}</Typography>
-                    <Typography variant="body2">Phone: {filteredEmployees[index].phoneNumber}</Typography>
-                    <Button variant="contained" color="primary" onClick={() => handleEditEmployee(filteredEmployees[index])}>
-                        Edit
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
-    );
+    const groupedEmployees = filteredEmployees.reduce((acc, employee) => {
+        if (!acc[employee.departmentName]) {
+            acc[employee.departmentName] = [];
+        }
+        acc[employee.departmentName].push(employee);
+        return acc;
+    }, {});
 
     return (
-        <div>
-            <TextField label="Search" onChange={handleSearch} />
-            <Button variant="contained" color="primary" onClick={handleAddEmployee}>Add Employee</Button>
-            {showForm && <EmployeeForm employee={selectedEmployee} onSubmit={handleFormSubmit} />}
-            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                <List
-                    height={400}
-                    itemCount={filteredEmployees.length}
-                    itemSize={150}
-                    width={1200}
-                >
-                    {Row}
+        <div style={{ display: 'flex', height: 'auto' }}>
+            <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '20px' }}>
+                <TextField label="Search" onChange={handleSearch} fullWidth />
+                <Button variant="contained" color="primary" onClick={handleAddEmployee} fullWidth>Add Employee</Button>
+                {showForm && <EmployeeForm employee={selectedEmployee} onSubmit={handleFormSubmit} onCancel={handleFormCancel} />}
+                <List>
+                    {Object.keys(groupedEmployees).map(departmentName => (
+                        <div key={departmentName}>
+                            <ListItem button onClick={() => handleDepartmentClick(departmentName)}>
+                                <ListItemText primary={departmentName} />
+                                {expandedDepartments[departmentName] ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                            {expandedDepartments[departmentName] && groupedEmployees[departmentName].map(employee => (
+                                <ListItem button key={employee.employeeId} onClick={() => handleEmployeeClick(employee)}>
+                                    <ListItemText primary={employee.fullName} secondary={employee.positionTitle} />
+                                </ListItem>
+                            ))}
+                        </div>
+                    ))}
                 </List>
+            </div>
+            <div style={{ width: '70%', padding: '20px', display: 'flex', justifyContent: 'center' }}>
+                {selectedEmployee && (
+                    <Card style={{ width: '60%', maxWidth: '80%' }}>
+                        <CardMedia
+                            component="img"
+                            style={{ height: 'auto', maxWidth: '100%' }}
+                            image={`data:image/jpeg;base64,${selectedEmployee.photo}`}
+                            alt={selectedEmployee.fullName}
+                        />
+                        <CardContent>
+                            <Typography variant="h5">{selectedEmployee.fullName}</Typography>
+                            <Typography variant="body1">Отдел: {selectedEmployee.departmentName}</Typography>
+                            <Typography variant="body1">Должность: {selectedEmployee.positionTitle}</Typography>
+                            <Typography variant="body1">Номер телефона: {selectedEmployee.phoneNumber}</Typography>
+                            <Button variant="contained" color="primary" onClick={() => handleEditEmployee(selectedEmployee)}>
+                                Редактировать
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </div>
     );

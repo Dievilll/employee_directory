@@ -11,6 +11,6 @@ namespace api.DTOs.Employee
             public int DepartmentId { get; set; }
             public int PositionId { get; set; }
             public string PhoneNumber { get; set; }
-            public IFormFile Photo { get; set; }
+            public IFormFile? Photo { get; set; }
     }
 }

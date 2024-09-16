@@ -33,6 +33,6 @@ namespace api.Models
         [MaxLength(20)]
         public string PhoneNumber { get; set; }
 
-        public byte[] Photo { get; set; }
+        public byte[]? Photo { get; set; }
     }
 }

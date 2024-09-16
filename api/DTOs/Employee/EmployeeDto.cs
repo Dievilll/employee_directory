@@ -15,6 +15,6 @@ namespace api.DTOs.Employee
         public int PositionId { get; set; }
         public string PositionTitle { get; set; }
         public string PhoneNumber { get; set; }
-        public byte [] Photo { get; set; }
+        public byte []? Photo { get; set; }
     }
 }
