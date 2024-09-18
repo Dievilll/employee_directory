@@ -14,9 +14,9 @@ namespace api.Interfaces
 
         Task<Department?> GetByIdAsync(int departmentId);
 
-        Task<Department> CreateAsync(Department departmentModel);
+        Task<Department> CreateAsync(DepartmentCreateDto departmentCreateDto);
 
-        Task<Department?> UpdateAsync(int id, DepartmentUpdateDto departmentUpdate);
+        Task<Department?> UpdateAsync(int id, DepartmentUpdateDto departmentUpdateDto);
 
         Task<Department?> DeleteAsync(int departmentId);
 

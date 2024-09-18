@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +18,12 @@ namespace api.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            base.OnModelCreating(modelBuilder);
             // между отделом и родительским
             modelBuilder.Entity<Department>()
                 .HasOne(pd => pd.ParentDepartment)
@@ -46,6 +51,8 @@ namespace api.Data
                 .WithMany()
                 .HasForeignKey(e => e.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
+

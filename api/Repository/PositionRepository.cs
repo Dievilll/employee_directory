@@ -61,17 +61,34 @@ namespace api.Repository
 
         public async Task<Position?> DeleteAsync(int positionId)
         {
-            var posModel = _context.Positions.FirstOrDefault(x => x.PositionId == positionId);
+            var posModel = await _context.Positions
+                .Include(p => p.Employees)
+                .FirstOrDefaultAsync(p => p.PositionId == positionId);
 
-            if(posModel == null)
+            if (posModel == null)
             {
-                return null;
+                throw new ArgumentException("Position not found.");
             }
 
+            _context.Employees.RemoveRange(posModel.Employees);
+
             _context.Positions.Remove(posModel);
+
             await _context.SaveChangesAsync();
 
             return posModel;
+        }
+
+        public async Task<List<PositionDto>> GetPositionsByDepartmentIdAsync(int departmentId)
+        {
+            return await _context.Positions
+                .Where(p => p.DepartmentId == departmentId)
+                .Select(p => new PositionDto
+                {
+                    PositionId = p.PositionId,
+                    Title = p.Title
+                })
+                .ToListAsync();
         }
 
         public async Task<bool> IsExistsAsync(int positionId)

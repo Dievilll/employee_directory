@@ -14,6 +14,7 @@ namespace api.Interfaces
         Task<Position> CreateAsync(Position positionModel);
         Task<Position?> UpdateAsync(int id, PositionUpdateDto positionUpdate);
         Task<Position?> DeleteAsync(int positionId);
+        Task<List<PositionDto>> GetPositionsByDepartmentIdAsync(int departmentId);
         Task<bool> IsExistsAsync(int positionId);
 
         Task<bool> AnyExistAsync();

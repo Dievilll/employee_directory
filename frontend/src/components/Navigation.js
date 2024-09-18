@@ -12,7 +12,7 @@ const Navigation = () => {
                     <Link to="/register" style={{ textDecoration: 'none', color: 'rgb(82, 160, 0)', fontFamily: 'Arial', fontWeight: 'bold' }}>Register</Link>
                 </li>
                 <li style={{ margin: '0 10px', padding: '10px 20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                    <Link to="/employees" style={{ textDecoration: 'none', color: 'inherit' }}>Employees</Link>
+                    <Link to="/employees" style={{ textDecoration: 'none', color: 'rgb(82, 160, 0)', fontWeight: 'bold' }}>Работники</Link>
                 </li>
                 <li style={{ margin: '0 10px', padding: '10px 20px', border: '1px solid #ccc', borderRadius: '5px' }}>
                     <Link to="/departments" style={{ textDecoration: 'none', color: 'inherit' }}>Departments</Link>

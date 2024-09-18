@@ -1,35 +1,29 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { TextField, Button } from '@mui/material';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
 const Auth = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        password: ''
-    });
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const { login } = useContext(AuthContext);
 
-    const { signIn } = useAuth();
-    const navigate = useNavigate();
-
-    const handleChange = (event) => {
-        setFormData({ ...formData, [event.target.name]: event.target.value });
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        signIn(formData.username, formData.password);
-        navigate('/employees'); // Перенаправление после успешной авторизации
+    const handleLogin = async () => {
+        try {
+            await login(username, password);
+            window.location.href = '/employees';
+        } catch (err) {
+            setError('Invalid username or password');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <TextField name="username" label="Username" value={formData.username} onChange={handleChange} />
-            <TextField name="password" label="Password" type="password" value={formData.password} onChange={handleChange} />
-            <Button type="submit" variant="contained" color="primary">
-                Sign In
-            </Button>
-        </form>
+        <div>
+            <h2>Login</h2>
+            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button onClick={handleLogin}>Login</button>
+            {error && <p>{error}</p>}
+        </div>
     );
 };
 

@@ -1,24 +1,30 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './components/AuthContext';
 
 const Auth = lazy(() => import('./components/Auth'));
 const Register = lazy(() => import('./components/Register'));
 const Employees = lazy(() => import('./components/EmployeeList'));
 const Departments = lazy(() => import('./components/DepartmentList'));
+const Unauthorized = lazy(() => import('./components/Unauthorized'));
 
 const App = () => (
-  <Router>
-    <Navigation />
-    <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        <Route path="/auth" element={<Auth/>} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/employees" element={<Employees/>} />
-        <Route path="/departments" element={<Departments/>} />
-      </Routes>
-    </Suspense>
-  </Router>
+  <AuthProvider>
+    <Router>
+      <Navigation />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+          <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+        </Routes>
+      </Suspense>
+    </Router>
+  </AuthProvider>
 );
 
 export default App;

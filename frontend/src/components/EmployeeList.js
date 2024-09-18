@@ -58,6 +58,16 @@ const EmployeeList = () => {
         setSelectedEmployee(employee);
     };
 
+    const handleDeleteEmployee = async (employeeId) => {
+        try {
+            await axios.delete(`http://localhost:5085/api/employee/${employeeId}`);
+            fetchEmployees();
+            setSelectedEmployee(null);
+        } catch (error) {
+            console.error('Error deleting employee:', error);
+        }
+    };
+
     const filteredEmployees = employees.filter(employee =>
         employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.phoneNumber.includes(searchTerm) ||
@@ -104,12 +114,16 @@ const EmployeeList = () => {
                             alt={selectedEmployee.fullName}
                         />
                         <CardContent>
-                            <Typography variant="h5">{selectedEmployee.fullName}</Typography>
-                            <Typography variant="body1">Отдел: {selectedEmployee.departmentName}</Typography>
-                            <Typography variant="body1">Должность: {selectedEmployee.positionTitle}</Typography>
-                            <Typography variant="body1">Номер телефона: {selectedEmployee.phoneNumber}</Typography>
-                            <Button variant="contained" color="primary" onClick={() => handleEditEmployee(selectedEmployee)}>
+                            <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h4">{selectedEmployee.fullName}</Typography>
+                            <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h6">Отдел: {selectedEmployee.departmentName}</Typography>
+                            <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h6">Должность: {selectedEmployee.positionTitle}</Typography>
+                            <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h6">Номер телефона: {selectedEmployee.phoneNumber}</Typography>
+                            <Button style={{ marginTop: '1%' }} variant="contained" color="primary" onClick={() => handleEditEmployee(selectedEmployee)}>
                                 Редактировать
+                            </Button>
+                            <br/>
+                            <Button style={{ marginTop: '1%' }} variant="contained" color="error" onClick={() => handleDeleteEmployee(selectedEmployee.employeeId)}>
+                                Удалить
                             </Button>
                         </CardContent>
                     </Card>

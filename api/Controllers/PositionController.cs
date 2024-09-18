@@ -92,5 +92,21 @@ namespace api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("{departmentId}/positions")]
+        public async Task<IActionResult> GetPositionsByDepartmentId(int departmentId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var positions = await _positionRepo.GetPositionsByDepartmentIdAsync(departmentId);
+
+            if (positions == null || positions.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(positions);
+        }
     }
 }
