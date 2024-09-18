@@ -85,8 +85,8 @@ const EmployeeList = () => {
     return (
         <div style={{ display: 'flex', height: 'auto' }}>
             <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '20px' }}>
-                <TextField label="Search" onChange={handleSearch} fullWidth />
-                <Button variant="contained" color="primary" onClick={handleAddEmployee} fullWidth>Add Employee</Button>
+                <TextField label="Поиск" onChange={handleSearch} fullWidth />
+                <Button style={{ marginTop: '1%', marginBottom: '3%' }} variant="contained" color="primary" onClick={handleAddEmployee} fullWidth>Добавить сотрудника</Button>
                 {showForm && <EmployeeForm employee={selectedEmployee} onSubmit={handleFormSubmit} onCancel={handleFormCancel} />}
                 <List>
                     {Object.keys(groupedEmployees).map(departmentName => (
@@ -96,7 +96,7 @@ const EmployeeList = () => {
                                 {expandedDepartments[departmentName] ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
                             {expandedDepartments[departmentName] && groupedEmployees[departmentName].map(employee => (
-                                <ListItem button key={employee.employeeId} onClick={() => handleEmployeeClick(employee)}>
+                                <ListItem style={{ marginLeft: '3%' }} button key={employee.employeeId} onClick={() => handleEmployeeClick(employee)}>
                                     <ListItemText primary={employee.fullName} secondary={employee.positionTitle} />
                                 </ListItem>
                             ))}
@@ -106,14 +106,14 @@ const EmployeeList = () => {
             </div>
             <div style={{ width: '70%', padding: '20px', display: 'flex', justifyContent: 'center' }}>
                 {selectedEmployee && (
-                    <Card style={{ width: '60%', maxWidth: '80%' }}>
+                    <Card style={{ width: 'auto', height: 'auto' }}>
                         <CardMedia
                             component="img"
-                            style={{ height: 'auto', maxWidth: '100%' }}
+                            style={{ height: 'auto', maxWidth: '60%', minWidth: '60%' , margin: 'auto' }}
                             image={`data:image/jpeg;base64,${selectedEmployee.photo}`}
                             alt={selectedEmployee.fullName}
                         />
-                        <CardContent>
+                        <CardContent style={{ height: 'auto' }}>
                             <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h4">{selectedEmployee.fullName}</Typography>
                             <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h6">Отдел: {selectedEmployee.departmentName}</Typography>
                             <Typography style={{ borderBottom: '1px solid #ccc', marginBottom: '1%' }} variant="h6">Должность: {selectedEmployee.positionTitle}</Typography>

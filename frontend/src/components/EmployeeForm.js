@@ -69,7 +69,6 @@ const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
             } else {
                 await axios.post('http://localhost:5085/api/employee', form);
             }
-            window.location.reload();
             onSubmit();
         } catch (error) {
             console.error('Error saving employee:', error);
@@ -77,12 +76,12 @@ const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '2%' }}>
-            <TextField name="fullName" label="Full Name" value={formData.fullName} onChange={handleChange} />
-            <TextField name="phoneNumber" label="Phone Number" value={formData.phoneNumber} onChange={handleChange} />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '2%', marginBottom: '2%' }}>
+            <TextField name="fullName" label="ФИО" value={formData.fullName} onChange={handleChange} />
+            <TextField name="phoneNumber" label="Номер телефона" value={formData.phoneNumber} onChange={handleChange} />
 
             <FormControl>
-                <InputLabel>Department</InputLabel>
+                <InputLabel>Отдел</InputLabel>
                 <Select
                     name="departmentId"
                     value={formData.departmentId}
@@ -97,7 +96,7 @@ const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
             </FormControl>
 
             <FormControl>
-                <InputLabel>Position</InputLabel>
+                <InputLabel>Должность</InputLabel>
                 <Select
                     name="positionId"
                     value={formData.positionId}

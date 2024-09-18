@@ -17,7 +17,7 @@ namespace api.Repository
 
         public async Task<User> Register(User user, string password)
         {
-            user.Password = password; // Просто сохраняем пароль как есть
+            user.Password = password; // Просто сохраняем пароль как есть, без хеширования
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -40,6 +40,12 @@ namespace api.Repository
         public async Task<bool> UserExists(string username)
         {
             return await _context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        public async Task<User> CheckAuth(string username)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return user;
         }
     }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, List, ListItem, ListItemText, Input, Card, CardContent, Typography, ListItemSecondaryAction, Checkbox, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-
+import { TextField, Button, ListItem, ListItemText, Typography, Checkbox, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 const DepartmentForm = ({ department, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         name: department?.name || '',
@@ -15,6 +15,7 @@ const DepartmentForm = ({ department, onSubmit, onCancel }) => {
     const [positionsToDelete, setPositionsToDelete] = useState([]);
     const [editingPosition, setEditingPosition] = useState(null);
     const [departments, setDepartments] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchDepartments();
@@ -101,8 +102,9 @@ const DepartmentForm = ({ department, onSubmit, onCancel }) => {
             } else {
                 await axios.post('http://localhost:5085/api/department', data);
             }
-            window.location.reload();
-            onSubmit();
+            //window.location.reload();
+            onSubmit(navigate('/departments'));
+            
         } catch (error) {
             console.error('Error saving department:', error);
         }
@@ -145,10 +147,6 @@ const DepartmentForm = ({ department, onSubmit, onCancel }) => {
                 </Select>
             </FormControl>
 
-            <Typography variant="h6" component="h2">
-                Должности
-            </Typography>
-
             {formData.positionsToUpdate.map((position, index) => (
                 <ListItem key={index}>
                     {editingPosition && editingPosition.positionId === position.positionId ? (
@@ -183,8 +181,11 @@ const DepartmentForm = ({ department, onSubmit, onCancel }) => {
                     )}
                 </ListItem>
             ))}
-
+            {department? 
             <ListItem>
+                <Typography variant="h6" component="h2">
+                    Должности
+                </Typography>
                 <TextField
                     label="Название должности"
                     value={newPositionTitle}
@@ -194,18 +195,19 @@ const DepartmentForm = ({ department, onSubmit, onCancel }) => {
                     label="Зарплата"
                     value={newPositionSalary}
                     onChange={(e) => setNewPositionSalary(e.target.value.replace(/\D/g, ''))}
-                    //inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 />
                 <Button style={{ marginLeft: '1%' }} variant="contained" color="primary" onClick={handleAddPosition}>
                     Добавить должность
                 </Button>
             </ListItem>
+            : null}
+            
 
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button type="submit" variant="contained" color="primary">
+                <Button type="submit" variant="outlined" color="primary">
                     {department ? 'Обновить' : 'Добавить'} отдел
                 </Button>
-                <Button variant="contained" color="secondary" onClick={onCancel}>
+                <Button variant="outlined" color="error" onClick={onCancel}>
                     Отмена
                 </Button>
             </div>

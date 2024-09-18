@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, List, ListItem, ListItemText, Card, CardContent, Typography, ListItemSecondaryAction } from '@mui/material';
+import { TextField, Button, List, ListItem, ListItemText, Card, CardContent, Typography } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import DepartmentForm from './DepartmentForm';
 
@@ -13,7 +13,7 @@ const DepartmentList = () => {
     const [positionNames, setPositionNames] = useState({});
     const [expandedDepartments, setExpandedDepartments] = useState({});
     const [filteredDepartments, setFilteredDepartments] = useState([]);
-    const [isEditing, setIsEditing] = useState(false); // Добавляем состояние для отслеживания редактирования
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         fetchDepartments();
@@ -35,8 +35,6 @@ const DepartmentList = () => {
             department.subDepartments = [];
             departmentMap[department.departmentId] = department;
         });
-    
-        // Строим дерево
         departments.forEach(department => {
             if (department.parentDepartmentId) {
                 const parentDepartment = departmentMap[department.parentDepartmentId];
@@ -56,7 +54,7 @@ const DepartmentList = () => {
             const response = await axios.get('http://localhost:5085/api/department');
             const departmentTree = buildDepartmentTree(response.data);
             setDepartments(departmentTree);
-            setFilteredDepartments(departmentTree); // Инициализируем filteredDepartments
+            setFilteredDepartments(departmentTree);
             fetchDepartmentNames(response.data);
             fetchPositionNames(response.data);
         } catch (error) {
@@ -100,24 +98,24 @@ const DepartmentList = () => {
     const handleAddDepartment = () => {
         setSelectedDepartment(null);
         setShowForm(true);
-        setIsEditing(false); // Сбрасываем состояние редактирования
+        setIsEditing(false);
     };
 
     const handleEditDepartment = (department) => {
         setSelectedDepartment(department);
         setShowForm(true);
-        setIsEditing(true); // Устанавливаем состояние редактирования
+        setIsEditing(true);
     };
 
     const handleFormSubmit = () => {
         setShowForm(false);
         fetchDepartments();
-        setIsEditing(false); // Сбрасываем состояние редактирования
+        setIsEditing(false);
     };
 
     const handleFormCancel = () => {
         setShowForm(false);
-        setIsEditing(false); // Сбрасываем состояние редактирования
+        setIsEditing(false);
     };
 
     const handleDepartmentClick = (departmentId) => {
@@ -143,7 +141,7 @@ const DepartmentList = () => {
         try {
             await axios.delete(`http://localhost:5085/api/department/${departmentId}`);
             fetchDepartments();
-            setSelectedDepartment(null); // Сброс выбранного отдела после удаления
+            setSelectedDepartment(null);
         } catch (error) {
             console.error('Error deleting department:', error);
         }
@@ -160,7 +158,7 @@ const DepartmentList = () => {
                     </Button>
                 </ListItem>
                 {expandedDepartments[department.departmentId] && (
-                    <List style={{ paddingLeft: '20px' }}>
+                    <List style={{ paddingLeft: '20px', marginLeft: '1%' }}>
                         {renderDepartments(department.subDepartments)}
                     </List>
                 )}
@@ -179,7 +177,7 @@ const DepartmentList = () => {
 
             if (department.subDepartments.length > 0) {
                 department.subDepartments = filterDepartments(department.subDepartments, searchTerm);
-                return department.subDepartments.length > 0;
+                return true;
             }
 
             return false;
@@ -195,7 +193,8 @@ const DepartmentList = () => {
                     color="primary" 
                     onClick={handleAddDepartment} 
                     fullWidth 
-                    disabled={isEditing} // Отключаем кнопку, если идет редактирование
+                    disabled={isEditing}
+                    style={{ marginTop: '1%', marginBottom: '2%' }}
                 >
                     Добавить отдел
                 </Button>

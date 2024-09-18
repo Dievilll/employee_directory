@@ -25,6 +25,14 @@ namespace api.Controllers
             _departmentRepo = departmentRepository;
         }
 
+        [HttpOptions]
+        public IActionResult PreflightRoute()
+        {
+            Response.Headers.Append("Access-Control-Allow-Origin", "*");
+            Response.Headers.Append("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS");
+            return NoContent();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] QueryObjectDepartment query)
         {

@@ -8,16 +8,16 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        // Проверка аутентификации при загрузке приложения
         checkAuth();
     }, []);
 
     const checkAuth = async () => {
         try {
-            const response = await axios.get('http://localhost:5085/api/auth/check');
-            setIsAuthenticated(true);
-            setUser(response.data.user);
-        } catch (err) {
+                const response = await axios.get('http://localhost:5085/api/auth/check');
+                setIsAuthenticated(true);
+                setUser(response.data.user);
+            }
+        catch (err) {
             setIsAuthenticated(false);
             setUser(null);
         }

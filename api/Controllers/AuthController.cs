@@ -2,11 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using api.Interfaces;
 using api.Models;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 
 namespace api.Controllers
 {
     [Route("api/auth")]
     [ApiController]
+    [EnableCors("AllowAllOrigins")]
+    
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
@@ -16,23 +19,12 @@ namespace api.Controllers
             _authRepository = authRepository;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] Register model)
+        [HttpOptions("login")]
+        public IActionResult PreflightRoute()
         {
-            if (await _authRepository.UserExists(model.Username))
-            {
-                return BadRequest("Username already exists.");
-            }
-
-            if (model.Password != model.ConfirmPassword)
-            {
-                return BadRequest("Passwords do not match.");
-            }
-
-            var user = new User { Username = model.Username, Role = "User" }; // Устанавливаем роль по умолчанию
-            await _authRepository.Register(user, model.Password);
-
-            return Ok("User successfully registered.");
+            Response.Headers.Append("Access-Control-Allow-Origin", "*");
+            Response.Headers.Append("Access-Control-Allow-Methods", "POST, OPTIONS");
+            return NoContent();
         }
 
         [HttpPost("login")]
@@ -45,7 +37,26 @@ namespace api.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
-            return Ok(user );
+            return Ok(user);
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            return Ok("User successfully logged out.");
+        }
+
+        [HttpGet("check")]
+        public async Task<IActionResult> CheckAuth(string username)
+        {
+            var user = await _authRepository.CheckAuth(username);
+
+            if (user == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+
+            return Ok(new { user });
         }
     }
 }
